@@ -174,6 +174,21 @@ PotMPU6050Device >> initialize [
 	
 ]
 
+{ #category : #controlling }
+PotMPU6050Device >> monitorRollPitchYaw [
+	| gyro errX errY errZ |
+	self initialize.
+	gyro := self readGyroscopeAngleXYZ.
+	errX := gyro at: 1.
+	errY := gyro at: 2.
+	errZ := gyro at: 3.
+	readProcess := [ [ gyro := self readGyroscopeAngleXYZ.
+	pitch := (gyro at: 1) + (errX * -1) round: 0.
+	roll := (gyro at: 2) + (errY * -1) round: 0.
+	yaw := (gyro at: 3) + (errZ * -1) round: 0 ] ]
+		forkNamed: 'MPU6050readProcess'
+]
+
 { #category : #acessing }
 PotMPU6050Device >> pitch [
 	^ pitch
